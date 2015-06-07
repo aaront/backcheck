@@ -4,6 +4,8 @@ import urllib.parse
 import asyncio
 
 import aiohttp
+import lxml.html
+import lxml.html.clean
 
 
 class BaseAsyncScraper(object):
@@ -29,7 +31,8 @@ class BaseAsyncScraper(object):
         url = self._format_url(base, data)
         with (yield from sem):
             page = yield from self._fetch(url)
-        self.pages.append(self._process(data, page))
+        tree = lxml.html.fromstring(lxml.html.clean.clean_html(page.decode('utf-8', 'ignore')))
+        self.pages.append(self._process(data, tree))
 
     def _get(self, base: str, urls: list):
         sem = asyncio.Semaphore(self.concurrency)

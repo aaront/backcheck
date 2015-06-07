@@ -2,7 +2,6 @@
 
 from dateutil.parser import parse
 import lxml.html
-import lxml.html.clean
 
 from backcheck import scrapers, helpers, models
 
@@ -47,15 +46,13 @@ class PlayerSummaryScraper(scrapers.BaseAsyncScraper):
                                     helpers.get_int(cols[11]), helpers.get_float(cols[12])))
         return stats
 
-    def _process(self, data: dict, page: bytes) -> models.Player:
-        tree = lxml.html.fromstring(lxml.html.clean.clean_html(page.decode('utf-8', 'ignore')))
-        names = self._process_names(tree.xpath('//div[@id="tombstone"]//h1/div')[0])
-        position = tree.xpath('//div[@id="tombstone"]/div[2]/div[2]/span')[0].text_content()
-        bio = self._process_bio(tree.xpath('//table[contains(@class, "bioInfo")]//td'))
-        stats_tables = tree.xpath('//table[contains(@class, "playerStats")]')
+    def _process(self, data: dict, page: lxml.html.HtmlElement) -> models.Player:
+        names = self._process_names(page.xpath('//div[@id="tombstone"]//h1/div')[0])
+        position = page.xpath('//div[@id="tombstone"]/div[2]/div[2]/span')[0].text_content()
+        bio = self._process_bio(page.xpath('//table[contains(@class, "bioInfo")]//td'))
+        stats_tables = page.xpath('//table[contains(@class, "playerStats")]')
         season_stats = self._process_season_stats(stats_tables[2], False)
         playoff_stats = self._process_season_stats(stats_tables[3], True)
-
         birth_date = parse(bio['birthdate'].split('(')[0]).date()
         player = models.Player(data['id'], names['first'], names['last'], birth_date, bio['birthplace'],
                                names['number'], position, bio['shoots'], bio['height'], int(bio['weight']))
