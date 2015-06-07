@@ -4,8 +4,10 @@ from datetime import date, datetime
 
 from backcheck.helpers import season_by_date
 
+
 class PlayerSeason(object):
-    def __init__(self, season: str, is_playoff: bool, team: str, gp: int, g: int, a: int, pm: int, pim: int, ppg: int, shg: int, gwg: int, s: int, sp: float):
+    def __init__(self, season: str, is_playoff: bool, team: str, gp: int, g: int, a: int, pm: int, pim: int, ppg: int,
+                 shg: int, gwg: int, s: int, sp: float):
         self.season = season
         self.is_playoff = is_playoff
         self.team = team
@@ -23,8 +25,10 @@ class PlayerSeason(object):
     def __str__(self):
         return '{0}: {1}{2}'.format(self.season, self.team, ' / PO' if self.is_playoff else '')
 
+
 class Player(object):
-    def __init__(self, id: int, first_name: str, last_name: str, birth_date: date, birth_place: str, number:int, position:str, shoots: str, height: str, weight: int):
+    def __init__(self, id: int, first_name: str, last_name: str, birth_date: date, birth_place: str, number:int,
+                 position:str, shoots: str, height: str, weight: int):
         self.id = id
         self.first_name = first_name
         self.last_name = last_name

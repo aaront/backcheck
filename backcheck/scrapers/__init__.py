@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import urllib.parse
-
 import asyncio
+
 import aiohttp
+
 
 class BaseAsyncScraper(object):
     def __init__(self, concurrency: int=10):

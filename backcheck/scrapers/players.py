@@ -6,6 +6,7 @@ import lxml.html.clean
 
 from backcheck import scrapers, helpers, models
 
+
 class PlayerSummaryScraper(scrapers.BaseAsyncScraper):
     def __init__(self, concurrency: int):
         super().__init__(concurrency)
@@ -28,7 +29,7 @@ class PlayerSummaryScraper(scrapers.BaseAsyncScraper):
                 key = helpers.get_ascii_content(cell.text_content().lower())
                 if key.strip() == '':
                     continue
-                bio[key[:-1]] = helpers.get_ascii_content(cells[i+1].text_content())
+                bio[key[:-1]] = helpers.get_ascii_content(cells[i + 1].text_content())
         return bio
 
     @staticmethod
@@ -39,7 +40,11 @@ class PlayerSummaryScraper(scrapers.BaseAsyncScraper):
             cols = [helpers.get_ascii_content(c.text_content()) for c in row.xpath('.//td')]
             if cols[0] == '':
                 continue
-            stats.append(models.PlayerSeason(cols[0], is_playoff, cols[1], helpers.get_int(cols[2]), helpers.get_int(cols[3]), helpers.get_int(cols[4]), helpers.get_int(cols[6]), helpers.get_int(cols[7]), helpers.get_int(cols[8]), helpers.get_int(cols[9]), helpers.get_int(cols[10]), helpers.get_int(cols[11]), helpers.get_float(cols[12])))
+            stats.append(
+                models.PlayerSeason(cols[0], is_playoff, cols[1], helpers.get_int(cols[2]), helpers.get_int(cols[3]),
+                                    helpers.get_int(cols[4]), helpers.get_int(cols[6]), helpers.get_int(cols[7]),
+                                    helpers.get_int(cols[8]), helpers.get_int(cols[9]), helpers.get_int(cols[10]),
+                                    helpers.get_int(cols[11]), helpers.get_float(cols[12])))
         return stats
 
     def _process(self, data: dict, page: bytes) -> models.Player:
@@ -52,7 +57,8 @@ class PlayerSummaryScraper(scrapers.BaseAsyncScraper):
         playoff_stats = self._process_season_stats(stats_tables[3], True)
 
         birth_date = parse(bio['birthdate'].split('(')[0]).date()
-        player = models.Player(data['id'], names['first'], names['last'], birth_date, bio['birthplace'], names['number'], position, bio['shoots'], bio['height'], int(bio['weight']))
+        player = models.Player(data['id'], names['first'], names['last'], birth_date, bio['birthplace'],
+                               names['number'], position, bio['shoots'], bio['height'], int(bio['weight']))
         for s in season_stats:
             player.add_season(s)
         for s in playoff_stats:
@@ -62,4 +68,3 @@ class PlayerSummaryScraper(scrapers.BaseAsyncScraper):
     def get(self, ids: list):
         data = [dict(id=id, view='stats') for id in ids]
         return self._get('http://www.nhl.com/ice/player.htm', data)
-
