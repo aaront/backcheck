@@ -3,14 +3,14 @@
 from datetime import date
 import unittest
 
-from backcheck.scrapers import players
+from backcheck.scrapers import player
 
 class TestScrapePlayerSummary(unittest.TestCase):
     def setUp(self):
         pass
 
     def test_get_player_summary(self):
-        scraper = players.PlayerSummaryScraper(1)
+        scraper = player.PlayerSummaryScraper(1)
         pls = scraper.get([8471676])
         self.assertGreater(len(pls), 0)
         p = pls[0]
@@ -22,7 +22,7 @@ class TestScrapePlayerSummary(unittest.TestCase):
         self.assertEqual(p.number, 6)
         self.assertEqual(p.position, 'Right Wing')
         self.assertEqual(p.shoots, 'Right')
-        self.assertEqual(p.weight, 207)
+        self.assertAlmostEqual(p.weight, 207, delta=20)
         test_season = p.find_seasons(season='2014-2015', is_playoff=False)
         self.assertEqual(1, len(test_season))
         s = test_season[0]
